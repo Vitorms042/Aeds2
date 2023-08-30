@@ -3,7 +3,6 @@
 #include <string.h>
 #include<stdbool.h>
 
-
 bool isPalindromo(char* s){
      int j = strlen(s) - 1;
 
