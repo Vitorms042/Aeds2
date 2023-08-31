@@ -2,12 +2,11 @@ import java.util.Random;
 import java.util.Scanner;
 public class TP01Q04 {
 
-    public static String alteracaoAleatoria(String s) {
-        Random gerador = new Random();
-        gerador.setSeed(4);
+    public static String alteracaoAleatoria(String s, Random gerador) {
         //Gera duas letras aleatorias
         char letra1 = ((char) ('a' + (Math.abs(gerador.nextInt()) % 26)));
         char letra2 = ((char) ('a' + (Math.abs(gerador.nextInt()) % 26)));
+        System.out.println(letra1 + " " + letra2);
         String resp = "";
 
         for (int i = 0; i < s.length(); i++) {
@@ -28,11 +27,13 @@ public class TP01Q04 {
         return (s.length() >= 3 && s.charAt(0) == 'F' && s.charAt(1) == 'I' && s.charAt(2) == 'M');
     }
     public static void main(String[] args) throws Exception {
+        Random gerador = new Random();
+        gerador.setSeed(4);
         Scanner sc = new Scanner(System.in);
         String string = "";
         string = sc.nextLine();
         while (!isFim(string)) {
-            System.out.println(alteracaoAleatoria(string));
+            System.out.println(alteracaoAleatoria(string, gerador));
             string = sc.nextLine();
         }
         sc.close();

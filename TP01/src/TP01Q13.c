@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 
 char *alteracaoAleatoria(char *s) {
-    srand(4); // Semente fixa, produzirá a mesma sequência a cada vez
     char letra1 = (char) ('a' + (rand() % 26));
     char letra2 = (char) ('a' + (rand() % 26));
     char *resp = malloc(strlen(s) + 1);
@@ -25,6 +23,7 @@ int isFim(char *s) {
 }
 
 int main() {
+    srand(4); // Semente fixa, produzirá a mesma sequência a cada vez
     char string[3000];
     scanf(" %[^\n]", string);
     while (!isFim(string)) {
