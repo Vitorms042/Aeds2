@@ -6,7 +6,6 @@ public class TP01Q04 {
         //Gera duas letras aleatorias
         char letra1 = ((char) ('a' + (Math.abs(gerador.nextInt()) % 26)));
         char letra2 = ((char) ('a' + (Math.abs(gerador.nextInt()) % 26)));
-        System.out.println(letra1 + " " + letra2);
         String resp = "";
 
         for (int i = 0; i < s.length(); i++) {
