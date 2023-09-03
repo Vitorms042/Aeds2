@@ -2,9 +2,6 @@ import java.util.*;
 import java.io.*;
 
 public class TP01Q07 {
-
-    public static boolean isFim(String input){ return( input.compareTo("FIM") == 0); }
-    
     public static void main(String[] args) throws IOException {
 
         double input;
