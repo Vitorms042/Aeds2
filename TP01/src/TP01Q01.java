@@ -12,18 +12,14 @@ public class TP01Q01 {
         return (s.length() >= 3 && s.charAt(0) == 'F' && s.charAt(1) == 'I' && s.charAt(2) == 'M');
     }
     public static void main(String[] args) throws Exception {
-        String[] texto = new String[3000];
-        int numEntrada = 0;
-        while(true){
-            texto[numEntrada] = MyIO.readLine();
-            if(isFim(texto[numEntrada])){
-                break;
-            }else if(isPalindromo(texto[numEntrada])){
+        String texto = MyIO.readLine();
+        while (!isFim(texto)) {
+            if (isPalindromo(texto)) {
                 System.out.println("SIM");
-            }else{
+            } else {
                 System.out.println("NAO");
             }
-            numEntrada++;
-        }        
+            texto = MyIO.readLine();
+        }
     }
 }

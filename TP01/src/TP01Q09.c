@@ -1,22 +1,45 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-int main(){
-    double entrada;
-    File *arquivo = fopen("entrada.txt", "rw");
+int main() {
+    double input;
+    FILE *file = fopen("entrada.txt", "wb");
     int size;
+
+    if (file == NULL) {
+        return 1;
+    }
+
     scanf("%d", &size);
 
-    for(int i = 0; i < size; i++){
-       scanf("%lf", &entrada);
-       fprintf(arquivo, "%lf\n", entrada);
+    // Leitura de valores Double e gravação no arquivo binário
+    for (int i = size; i > 0; i--) {
+        scanf("%lf", &input);
+        fwrite(&input, sizeof(double), 1, file);
     }
 
-    for(int i = (size -1); i >= 0; i--){
+    fclose(file); // Fecha o arquivo após a gravação
+
+    file = fopen("entrada.txt", "rb"); // Abre o arquivo binário para leitura
+
+    if (file == NULL) {
+        return 1;
+    }
+
+    // Seleciona a posição de bytes para acessar de trás para frente todos os valores de Double lidos anteriormente
+    for (int i = size - 1; i >= 0; i--) {
+        fseek(file, i * sizeof(double), SEEK_SET);
         double resp;
-        fscanf(arquivo, "%lf\n", &resp);
+        fread(&resp, sizeof(double), 1, file);
+        int x = (int)resp;
+        if (x == resp) {
+            printf("%d\n", x);
+        } else {
+            printf("%.3lf\n", resp);
+        }
     }
 
+    fclose(file); // Fecha o arquivo após a leitura
 
+    return 0;
 }
