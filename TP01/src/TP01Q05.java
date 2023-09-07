@@ -1,7 +1,7 @@
 import java.util.Scanner;
 
 public class TP01Q05 {
-// FUNCIONA
+
     public static String space(String line){
         String str = new String();
         for(int i = 0; i<line.length();i++){
@@ -12,7 +12,6 @@ public class TP01Q05 {
         return str;
     }
 
-// FUNCIONA
     public static String toReplace(String line){
         String str = new String();
         if((line.charAt(0)-48) == 2){
@@ -72,7 +71,7 @@ public class TP01Q05 {
             }
             return false;
         }
-        // FUNCIONA
+
         public static String decrease(String line, int position, int position2, boolean result){
             String str = new String();
             if(line.charAt(position-1) == 'd' || line.charAt(position-1) == 't'){
