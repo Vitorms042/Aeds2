@@ -43,3 +43,7 @@ int main(){
 
     printf("Falta(m) %d pomekon(s).", qtdPokemons - cont);
 }
+
+/*
+contains
+*/
