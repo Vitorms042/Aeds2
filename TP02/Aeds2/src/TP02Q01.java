@@ -103,7 +103,7 @@ class Jogador {
     }
 
     public Jogador clone() {
-        Jogador clone = new Jogador(id, nome, altura, peso, universidade, anoNascimento, cidadeNascimento, estadoNascimento);
+        Jogador clone = new Jogador(getId(), getNome(), getAltura(), getPeso(), getUniversidade(), getAnoNascimento(), getCidadeNascimento(), getEstadoNascimento());
         return clone;
     }
 
@@ -148,7 +148,7 @@ class Jogador {
             setUniversidade(array[4]);
         }
 
-        imprimirDados();;
+        imprimirDados();
         break;
       }
     }
