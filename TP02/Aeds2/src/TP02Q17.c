@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include <time.h>
 
+int comparacoes = 0;
+int movimentacoes = 0;
+
 typedef struct Jogador{
 
     char id[100];
@@ -42,15 +45,52 @@ int frase(char* frase){
     return numero;
 }
 
-void insercao(Jogador* jogador, int tam){
-    for(int i = 1; i < tam; i++){
-        Jogador tmp = jogador[i];
-        int j = i - 1;
-        while(j >= 0 && frase(jogador[j].nome) > frase(tmp.nome)){
-            jogador[j + 1] = jogador[j];
-            j--;
-        }
-        jogador[j + 1] = tmp;
+int comparacao(const void *a, const void *b){
+    Jogador *jogador1 = (Jogador *)a;
+    Jogador *jogador2 = (Jogador *)b;
+
+    int result = atoi(jogador1->altura) - atoi(jogador2->altura);
+
+    if(result == 0){
+        return strcmp(jogador1->nome, jogador2->nome);
+    }else{
+        return result;
+    }
+}
+
+void maxHeapify(Jogador *jogador, int n, int i) {
+    int maior = i;
+    int esq = 2 * i + 1;
+    int dir = 2 * i + 2;
+
+    if(esq < n && comparacao(&jogador[esq], &jogador[maior]) > 0){
+        maior = esq;
+    }
+    if(dir < n && comparacao(&jogador[dir], &jogador[maior]) > 0 > 0){
+        maior = dir;
+    }
+    if(maior != i) {
+        Jogador temp = jogador[i];
+        jogador[i] = jogador[maior];
+        jogador[maior] = temp;
+        maxHeapify(jogador, n, maior);
+    }
+}
+
+void buildMaxHeap(Jogador *jogador, int n) {
+    for (int i = n / 2 - 1; i >= 0; i--) {
+        maxHeapify(jogador, n, i);
+    }
+}
+
+void heapsort(Jogador *jogador, int n) {
+    buildMaxHeap(jogador, n);
+
+    for (int i = n - 1; i > 0; i--) {
+        Jogador temp = jogador[0];
+        jogador[0] = jogador[i];
+        jogador[i] = temp;
+        maxHeapify(jogador, i, 0);
     }
 }
 
@@ -171,13 +211,14 @@ void ler (Jogador *jogador, char linha[1000]){
 
 int main (){
     clock_t inicio, fim;
-    int comparacoes = 0;
+    inicio = clock();
     char dados[1000];
     FILE* arquivo = fopen("/tmp/players.csv","r");
-    Jogador jogador[3922];
+    Jogador jogador[3923];
+    Jogador jogadorSelecionado[3923];
     char id[100];
     char nome[100];
-    Jogador buscaBinaria[1000];
+    Jogador busca[1000];
     int contador = 0;
     
     fgets (dados, sizeof(dados), arquivo); 
@@ -187,72 +228,31 @@ int main (){
         i++;
     }
     
+    int j = 0;
     scanf("%s", id);
     while (strcmp(id, "FIM") != 0){
-        for (int j = 0; j < 3922; j++){
-            if(strcmp(jogador[j].id,id) == 0) {
-                buscaBinaria[contador] = clone(&jogador[j]);
-                contador++; 
-            }
+          jogadorSelecionado[j++] = clone(&jogador[atoi(id)]);        
+          scanf("%s", id);
         }
-        scanf("%s", id);
-    }
- 
-    inicio = clock();
-    insercao(buscaBinaria, contador);
-    scanf(" %[^\n]", nome);
+    
+    heapsort(jogadorSelecionado, j);
 
-    while(strcmp(nome, "FIM") != 0){
-        comparacoes++;
-        bool check = false;
-        int esq = 0;
-        int dir = contador - 1;
-        int meio;
-        while(esq <= dir){
-            comparacoes++;
-            meio = (esq + dir) / 2;
-            if(strcmp(buscaBinaria[meio].nome, nome) == 0){
-                comparacoes++;
-                check = true;
-                esq = contador;
-            }else{
-                if((frase(buscaBinaria[meio].nome) - frase(nome)) < 0){
-                    comparacoes++;
-                    esq = meio + 1;
-                }else{
-                    dir = meio - 1;
-                }
-            }
-        }
-        if(check){
-            printf("SIM\n");
-        }else{
-            printf("NAO\n");
-        }
-        scanf(" %[^\n]", nome);
-    }
+    for(int i = 0; i < 10; i++) {
+      imprimir(&jogadorSelecionado[i]); 
+   }
 
     fim = clock();
 
-FILE *arquivoLog;
-    char nomeArquivoLog[] = "matricula_binaria.txt";
-
+    FILE *arquivoLog;
+    char nomeArquivoLog[] = "matricula_heapsort.txt";
     arquivoLog = fopen(nomeArquivoLog, "w");
-
-    if (arquivo == NULL) {
-        perror("Erro ao abrir o arquivo");
-        return 1;
-    }
 
     int matricula = 808664;
     double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
 
-    fprintf(arquivo, "Matricula: %d\tTempo: %.2f\tComparacoes: %d\n",
-            matricula, tempoExecucao, comparacoes);
+    fprintf(arquivo, "Matricula: %d\tTempo: %.2f\tComparacoes: %d\tMovimentacoes: %d\n",matricula, tempoExecucao, comparacoes, movimentacoes);
 
     fclose(arquivoLog);
-
-
     fclose(arquivo);
     return 0;
 }

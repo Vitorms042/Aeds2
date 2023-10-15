@@ -4,6 +4,9 @@
 #include <stdbool.h>
 #include <time.h>
 
+int comparacoes = 0;
+int movimentacoes = 0;
+
 typedef struct Jogador{
 
     char id[100];
@@ -42,16 +45,39 @@ int frase(char* frase){
     return numero;
 }
 
-void insercao(Jogador* jogador, int tam){
-    for(int i = 1; i < tam; i++){
-        Jogador tmp = jogador[i];
-        int j = i - 1;
-        while(j >= 0 && frase(jogador[j].nome) > frase(tmp.nome)){
-            jogador[j + 1] = jogador[j];
-            j--;
-        }
-        jogador[j + 1] = tmp;
+int comparacao(const void *a, const void *b){
+    Jogador *jogador1 = (Jogador *)a;
+    Jogador *jogador2 = (Jogador *)b;
+
+    int result = atoi(jogador1->peso) - atoi(jogador2->peso);
+
+    if(result == 0){
+        return strcmp(jogador1->nome, jogador2->nome);
+    }else{
+        return result;
     }
+}
+
+void shellsort(Jogador *jogador, int n){
+    int l = 1;
+    while(l < n / 3){
+        comparacoes++;
+        l = 3 * l + 1;
+    }
+    while(l >= 1){
+        for(int i = l; i < n; i++){
+          for(int j = i; j >= l; j -= l){
+            if(comparacao(&jogador[i], & jogador[j - l]) < 0){
+                comparacoes++;
+                Jogador tmp = jogador[j];
+                jogador[j] = jogador[j - l];
+                jogador[j - l] = tmp;
+                movimentacoes += 3;
+            }
+          }
+    }
+    l /= 3;
+  }
 }
 
 void ler (Jogador *jogador, char linha[1000]){
@@ -171,13 +197,13 @@ void ler (Jogador *jogador, char linha[1000]){
 
 int main (){
     clock_t inicio, fim;
-    int comparacoes = 0;
+    inicio = clock();
     char dados[1000];
     FILE* arquivo = fopen("/tmp/players.csv","r");
     Jogador jogador[3922];
     char id[100];
     char nome[100];
-    Jogador buscaBinaria[1000];
+    Jogador busca[1000];
     int contador = 0;
     
     fgets (dados, sizeof(dados), arquivo); 
@@ -189,70 +215,28 @@ int main (){
     
     scanf("%s", id);
     while (strcmp(id, "FIM") != 0){
-        for (int j = 0; j < 3922; j++){
-            if(strcmp(jogador[j].id,id) == 0) {
-                buscaBinaria[contador] = clone(&jogador[j]);
-                contador++; 
-            }
-        }
+        busca[contador++] = clone(&jogador[atoi(id)]);
         scanf("%s", id);
     }
  
-    inicio = clock();
-    insercao(buscaBinaria, contador);
-    scanf(" %[^\n]", nome);
+    shellsort(busca, contador);
 
-    while(strcmp(nome, "FIM") != 0){
-        comparacoes++;
-        bool check = false;
-        int esq = 0;
-        int dir = contador - 1;
-        int meio;
-        while(esq <= dir){
-            comparacoes++;
-            meio = (esq + dir) / 2;
-            if(strcmp(buscaBinaria[meio].nome, nome) == 0){
-                comparacoes++;
-                check = true;
-                esq = contador;
-            }else{
-                if((frase(buscaBinaria[meio].nome) - frase(nome)) < 0){
-                    comparacoes++;
-                    esq = meio + 1;
-                }else{
-                    dir = meio - 1;
-                }
-            }
-        }
-        if(check){
-            printf("SIM\n");
-        }else{
-            printf("NAO\n");
-        }
-        scanf(" %[^\n]", nome);
-    }
+    for(int i = 0; i < contador; i++) {
+      imprimir(&busca[i]); 
+   }
 
     fim = clock();
 
-FILE *arquivoLog;
-    char nomeArquivoLog[] = "matricula_binaria.txt";
-
+    FILE *arquivoLog;
+    char nomeArquivoLog[] = "matricula_shellsort.txt";
     arquivoLog = fopen(nomeArquivoLog, "w");
-
-    if (arquivo == NULL) {
-        perror("Erro ao abrir o arquivo");
-        return 1;
-    }
 
     int matricula = 808664;
     double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
 
-    fprintf(arquivo, "Matricula: %d\tTempo: %.2f\tComparacoes: %d\n",
-            matricula, tempoExecucao, comparacoes);
+    fprintf(arquivo, "Matricula: %d\tTempo: %.2f\tComparacoes: %d\tMovimentacoes: %d\n",matricula, tempoExecucao, comparacoes, movimentacoes);
 
     fclose(arquivoLog);
-
-
     fclose(arquivo);
     return 0;
 }
