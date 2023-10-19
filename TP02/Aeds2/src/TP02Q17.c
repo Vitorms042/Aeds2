@@ -1,258 +1,293 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
+#include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
-
-int comparacoes = 0;
-int movimentacoes = 0;
+#include <math.h>
 
 typedef struct Jogador{
-
-    char id[100];
-    char nome[100];
-    char peso[100];
-    char altura[100];
-    char universidade[100];
-    char anoNascimento[100];
-    char cidadeNascimento[100];
-    char estadoNascimento[100];
-
+    int id;
+    char nome[31];
+    int altura;
+    int peso;
+    char universidade[31];
+    int anoNascimento;
+    char cidadeNascimento[31];
+    char estadoNascimento[31];
 } Jogador;
-
-Jogador clone (Jogador *jogador){ 
-    Jogador novo; 
-    strcpy(novo.id, jogador->id);
-    strcpy(novo.nome, jogador->nome);
-    strcpy(novo.altura, jogador->altura);
-    strcpy(novo.peso, jogador->peso);
-    strcpy(novo.anoNascimento, jogador->anoNascimento);
-    strcpy(novo.cidadeNascimento, jogador->cidadeNascimento);
-    strcpy(novo.estadoNascimento, jogador->estadoNascimento);
-    strcpy(novo.universidade, jogador->universidade);
-    return novo;
-}
 
 void imprimir (Jogador *jogador){
     printf("[%s ## %s ## %s ## %s ## %s ## %s ## %s ## %s]\n", jogador->id, jogador->nome, jogador->altura, jogador->peso, jogador->anoNascimento , jogador->universidade, jogador->cidadeNascimento, jogador->estadoNascimento);
 }
 
-int frase(char* frase){
-    int numero = 0;
-    for(int i = 0; frase[i] != '\0'; i++){
-      numero += (int)frase[i];
+Jogador buscarJogadorPorId(int id, Jogador *jogadores, int qnt_jg){
+    for (int i = 0; i < qnt_jg; i++){
+        if (id == jogadores[i].id){
+            return jogadores[i];
+        }
     }
-    return numero;
+    Jogador jogadorNotFound;
+    jogadorNotFound.id = -1;
+    return jogadorNotFound;
 }
 
-int comparacao(const void *a, const void *b){
-    Jogador *jogador1 = (Jogador *)a;
-    Jogador *jogador2 = (Jogador *)b;
-
-    int result = atoi(jogador1->altura) - atoi(jogador2->altura);
-
-    if(result == 0){
-        return strcmp(jogador1->nome, jogador2->nome);
+Jogador ler(char *linha, int tam){
+    Jogador jogador;
+    int index[7];
+    int virg = 0;
+    for (int i = 0; i < tam; i++){
+        if (linha[i] == ','){
+            index[virg] = i;
+            virg++;
+        }
+    }
+    int i = 0;
+    int j = 0;
+    char id[5];
+    while (i < index[0]){
+        id[j] = linha[i];
+        j++;
+        i++;
+    }
+    id[j] = '\0';
+    int id_integer = atoi(id);
+    jogador.id = id_integer;
+    i = index[0] + 1;
+    j = 0;
+    char nome[21];
+    while (i < index[1]){
+        nome[j] = linha[i];
+        j++;
+        i++;
+    }
+    nome[j] = '\0';
+    strcpy(jogador.nome, nome);
+    i = index[1] + 1;
+    j = 0;
+    char altura[4];
+    while (i < index[2]){
+        altura[j] = linha[i];
+        j++;
+        i++;
+    }
+    altura[j] = '\0';
+    int altura_integer = atoi(altura);
+    jogador.altura = altura_integer;
+    i = index[2] + 1;
+    j = 0;
+    char peso[4];
+    while (i < index[3]){
+        peso[j] = linha[i];
+        j++;
+        i++;
+    }
+    peso[j] = '\0';
+    int peso_integer = atoi(peso);
+    jogador.peso = peso_integer;
+    i = index[3] + 1;
+    j = 0;
+    char universidade[31];
+    if ((index[4] - 1) - index[3] + 1 != 1){
+        while (i < index[4]){
+            universidade[j] = linha[i];
+            j++;
+            i++;
+        }
+        universidade[j] = '\0';
     }else{
-        return result;
+        strcpy(universidade, "nao informado");
+    }
+    strcpy(jogador.universidade, universidade);
+    i = index[4] + 1;
+    j = 0;
+    char anoNascimento[5];
+    while (i < index[5]){
+        anoNascimento[j] = linha[i];
+        j++;
+        i++;
+    }
+    anoNascimento[j] = '\0';
+    int anoNascimento_integer = atoi(anoNascimento);
+    jogador.anoNascimento = anoNascimento_integer;
+    i = index[5] + 1;
+    j = 0;
+    char cidadeNascimento[31];
+
+    if (index[6] - index[5] + 1 != 2){
+        while (i < index[6]){
+            cidadeNascimento[j] = linha[i];
+            j++;
+            i++;
+        }
+        cidadeNascimento[j] = '\0';
+    }else{
+        strcpy(cidadeNascimento, "nao informado");
+    }
+    strcpy(jogador.cidadeNascimento, cidadeNascimento);
+    i = index[6] + 1;
+    j = 0;
+    char estadoNascimento[31];
+    if ((tam - 3) - index[6] + 1 != 0){
+        while (i < tam - 1){
+            estadoNascimento[j] = linha[i];
+            j++;
+            i++;
+        }
+        estadoNascimento[j] = '\0';
+    }else{
+        strcpy(estadoNascimento, "nao informado");
+    }
+    strcpy(jogador.estadoNascimento, estadoNascimento);
+
+    return jogador;
+}
+
+void swap(Jogador *x, Jogador *y ){
+    Jogador temp = *x;
+    *x = *y;
+    *y = temp;
+}
+
+void insertionSort(Jogador *arr, int tam){
+    for(int i = 1; i < tam; i++){
+        Jogador temp = arr[i];
+        int j = i - 1;
+
+        while (j >= 0 && arr[j].anoNascimento > temp.anoNascimento){
+            arr[j+1] = arr[j];
+            j--;
+        }
+        arr[j+1] = temp;
     }
 }
 
-void maxHeapify(Jogador *jogador, int n, int i) {
+void PARCIALinsertionSort(Jogador *arr, int tam, int k){
+    for(int i = 1; i < tam; i++){
+        Jogador temp = arr[i];
+        int j = i - 1;
+
+        while (j >= 0 && arr[j].anoNascimento > temp.anoNascimento){
+            arr[j+1] = arr[j];
+            j--;
+        }
+        arr[j+1] = temp;
+
+        if(i >= k){
+            j = k - 1;
+            while(j > 0 && arr[j].anoNascimento == arr[k-1].anoNascimento){
+                j--;
+            }
+            for(int m = k; m < i; m++){
+                arr[m] = arr[m + 1];
+            }
+        }
+    }
+}
+
+void insertionSortParcial (Jogador* jogador, int tam, int k){
+        for (int i = 1; i < tam; i++){
+            Jogador temp = jogador[i];
+            int j = i < k ? i - 1 : k - 1; 
+            while (j >= 0 && (jogador[j].anoNascimento > temp.anoNascimento|| (jogador[j].anoNascimento == temp.anoNascimento && strcmp(jogador[j].nome, temp.nome) > 0))){
+                jogador[j+1] = jogador[j]; 
+                j--;
+            }
+            jogador[j+1] = temp; 
+    }
+}
+
+int comparar(const void *a, const void *b){
+    Jogador *jogadorA = (Jogador *)a;
+    Jogador *jogadorB = (Jogador *)b;
+
+    int resultadoAltura = (jogadorA->altura) - (jogadorB->altura);
+
+    if (resultadoAltura == 0){
+        return strcmp(jogadorA->nome, jogadorB->nome);
+    }else{
+        return resultadoAltura;
+    }
+}
+
+void maxHeapify(Jogador *arr, int n, int i) {
     int maior = i;
     int esq = 2 * i + 1;
     int dir = 2 * i + 2;
 
-    if(esq < n && comparacao(&jogador[esq], &jogador[maior]) > 0){
+    if (esq < n && comparar(&arr[esq], &arr[maior]) > 0) {
         maior = esq;
     }
-    if(dir < n && comparacao(&jogador[dir], &jogador[maior]) > 0 > 0){
+    if (dir < n && comparar(&arr[dir], &arr[maior]) > 0 > 0) {
         maior = dir;
     }
-    if(maior != i) {
-        Jogador temp = jogador[i];
-        jogador[i] = jogador[maior];
-        jogador[maior] = temp;
-        maxHeapify(jogador, n, maior);
+    if (maior != i) {
+        Jogador temp = arr[i];
+        arr[i] = arr[maior];
+        arr[maior] = temp;
+        maxHeapify(arr, n, maior);
     }
 }
 
-void buildMaxHeap(Jogador *jogador, int n) {
+void buildMaxHeap(Jogador *arr, int n) {
     for (int i = n / 2 - 1; i >= 0; i--) {
-        maxHeapify(jogador, n, i);
+        maxHeapify(arr, n, i);
     }
 }
 
-void heapsort(Jogador *jogador, int n) {
-    buildMaxHeap(jogador, n);
+void heapsort(Jogador *arr, int n) {
+    buildMaxHeap(arr, n);
 
     for (int i = n - 1; i > 0; i--) {
-        Jogador temp = jogador[0];
-        jogador[0] = jogador[i];
-        jogador[i] = temp;
-        maxHeapify(jogador, i, 0);
+        Jogador temp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = temp;
+        maxHeapify(arr, i, 0);
     }
 }
 
-void ler (Jogador *jogador, char linha[1000]){
+int main(){
 
-    int posicao[7];
-    int virgulas = 0;
-    for (int i = 0; i < strlen(linha); i++){
-        if(linha[i] == ','){
-            posicao[virgulas] = i;
-            virgulas++;
+    FILE *arq = fopen("/tmp/players.csv", "r");
+
+    if(arq == NULL){
+        printf("falha no arquivo\n");
+        return 1;
+    }
+
+    char linha[1001];
+    int qnt_jg = 3922;
+    Jogador jg_vet[qnt_jg];
+    int jg_index = 0;
+
+    fgets(linha, sizeof(linha), arq);
+    while (fgets(linha, sizeof(linha), arq) != NULL){
+        int tam = strlen(linha);
+        jg_vet[jg_index] = ler(linha, tam);
+        jg_index++;
+    }
+    fclose(arq);
+    char entrada[35];
+    strcpy(entrada, "entrada");
+
+    Jogador *jg_entrada = malloc(qnt_jg*sizeof(Jogador));
+    int index_jg_entrada = 0;
+
+    while (strcmp(entrada, "FIM") != 0){
+        scanf(" %[^\n]", entrada);
+        if (strcmp(entrada, "FIM") != 0){
+            int id_input = atoi(entrada);
+            jg_entrada[index_jg_entrada] = buscarJogadorPorId(id_input, jg_vet, qnt_jg);
+            index_jg_entrada++;
         }
     }
+    jg_entrada = realloc(jg_entrada, index_jg_entrada*sizeof(Jogador));
     
-    int count = 0;
-    char id[100];
-    char nome[100];
-    char peso[100];
-    char altura[100];
-    char universidade[100];
-    char anoNascimento[100];
-    char cidadeNascimento[100];
-    char estadoNascimento[100];
+    int k = 10;   
+    heapsort(jg_entrada, index_jg_entrada);
 
-    if (posicao[0] - 0 != 0){
-        for(int i = 0; i < posicao[0]; i++){
-          id[count++] = linha[i];
-        }
-        id[count] = '\0';
-        strcpy(jogador->id,id);
-    } else{
-        strcpy(jogador->id,"nao informado");  
+    for(int i = 0; i < k; i++){
+        imprimir(jg_entrada[i]);
     }
    
-    count = 0;
-
-    if (posicao[1] - (posicao[0]) != 1){
-        for(int j = posicao[0] + 1; j < posicao[1]; j++){
-        nome[count++] = linha[j];
-    }
-    nome[count] = '\0';
-    strcpy(jogador->nome,nome);
-    } else{
-    strcpy(jogador->nome,"nao informado");   
-    }
-    count = 0;
-
-    if (posicao[2] - (posicao[1]) != 1){
-        for (int k = posicao[1] + 1; k < posicao[2]; k++){
-            altura[count++] = linha[k];
-        }
-        altura[count] = '\0';
-        strcpy(jogador->altura,altura);
-    } else{
-    strcpy(jogador->altura,"nao informado");
-    }
-    count = 0;
-
-    if (posicao[3] - (posicao[2]) != 1){
-        for (int l = posicao[2] + 1; l < posicao[3]; l++){
-            peso[count++] = linha[l];
-        }
-        peso[count] = '\0';
-        strcpy(jogador->peso,peso);
-    } else{
-    strcpy(jogador->peso,"nao informado");
-    }
-    
-    count = 0;
-    if (posicao[4] - (posicao[3]) != 1){
-        for (int m = posicao[3] + 1; m < posicao[4]; m++){
-            universidade[count++] = linha[m];
-        }
-        universidade[count] = '\0';
-        strcpy(jogador->universidade,universidade);
-    } else{
-    strcpy(jogador->universidade,"nao informado");
-    }
-    
-    count = 0;
-
-    if (posicao[5] - (posicao[4]) != 1){
-        for (int n = posicao[4] + 1; n < posicao[5]; n++){
-            anoNascimento[count++] = linha[n];
-        }
-        anoNascimento[count] = '\0';
-        strcpy(jogador->anoNascimento,anoNascimento);
-    } else{
-    strcpy(jogador->anoNascimento,"nao informado");
-    }
-    
-    count = 0;
-
-    if (posicao[6] - (posicao[5]) != 1){
-        for(int o = posicao[5] + 1; o < posicao[6]; o++){
-            cidadeNascimento[count++] = linha[o];
-        }
-        cidadeNascimento[count] = '\0';
-       
-        strcpy(jogador->cidadeNascimento,cidadeNascimento);
-    } else{
-    strcpy(jogador->cidadeNascimento,"nao informado");
-    }
-    
-    count = 0;
-
-     if ((strlen(linha) - 1) - (posicao[6]) != 1){
-        for(int p = posicao[6] + 1; p < strlen(linha) - 1; p++){
-            estadoNascimento[count++] = linha[p];
-        }
-        estadoNascimento[count] = '\0';
-        strcpy(jogador->estadoNascimento,estadoNascimento);
-     } else{
-    strcpy(jogador->estadoNascimento,"nao informado");
-    }
-    count = 0;
-}
-
-int main (){
-    clock_t inicio, fim;
-    inicio = clock();
-    char dados[1000];
-    FILE* arquivo = fopen("/tmp/players.csv","r");
-    Jogador jogador[3923];
-    Jogador jogadorSelecionado[3923];
-    char id[100];
-    char nome[100];
-    Jogador busca[1000];
-    int contador = 0;
-    
-    fgets (dados, sizeof(dados), arquivo); 
-    int i = 0; 
-    while (fgets (dados, 1000, arquivo)){
-        ler(&jogador[i], dados); 
-        i++;
-    }
-    
-    int j = 0;
-    scanf("%s", id);
-    while (strcmp(id, "FIM") != 0){
-          jogadorSelecionado[j++] = clone(&jogador[atoi(id)]);        
-          scanf("%s", id);
-        }
-    
-    heapsort(jogadorSelecionado, j);
-
-    for(int i = 0; i < 10; i++) {
-      imprimir(&jogadorSelecionado[i]); 
-   }
-
-    fim = clock();
-
-    FILE *arquivoLog;
-    char nomeArquivoLog[] = "matricula_heapsort.txt";
-    arquivoLog = fopen(nomeArquivoLog, "w");
-
-    int matricula = 808664;
-    double tempoExecucao = (double)(fim - inicio) / CLOCKS_PER_SEC; 
-
-    fprintf(arquivo, "Matricula: %d\tTempo: %.2f\tComparacoes: %d\tMovimentacoes: %d\n",matricula, tempoExecucao, comparacoes, movimentacoes);
-
-    fclose(arquivoLog);
-    fclose(arquivo);
     return 0;
 }
