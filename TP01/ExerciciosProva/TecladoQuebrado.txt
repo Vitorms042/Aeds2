@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdbool.h>
+
+bool verificarSeTemBeiju(char*linha, int tam){
+    for(int i = 0; i < tam-1; i++){
+        if(linha[i] == '[' && (linha[i+1] != ']' && linha[i+1] != '[')){
+            return true;
+        }
+    }
+    return false;
+}
+char* extrairSemBeiju(char* linha, int tam){
+    char* semBeiju = malloc(tam*sizeof(char));
+    int index = 0;
+
+    for(int i = 0; i < tam; i++)
+    {
+        if(linha[i] != '[' && linha[i] != ']'){
+            semBeiju[index++] = linha[i];
+        }
+    }
+    semBeiju[index] = '\0';
+    semBeiju = realloc(semBeiju, index*sizeof(char));
+    return semBeiju;
+}
+int* acharIndexDoBeiju(char* linha, int tam, int* newTam){
+    int*arr = malloc(tam*sizeof(int));
+    int index = 0;
+    for(int i = 0; i < tam-1; i++){
+        if(linha[i] == '[' && (linha[i+1] != '[' && linha[i+1] != ']')){
+            arr[index++] = i;
+            for(int j = (i+1); j < tam; j++){
+                if(linha[j] == ']'){
+                    arr[index++] = j;
+                    break;
+                }
+            }
+        }
+    }
+    *newTam = index;
+    arr = realloc(arr, index*sizeof(int));
+    return arr;
+}
+char* extrairComBeiju(char* linha, int tam, char* beiju){
+    int beiju_index = 0;
+
+    char* semBeiju = malloc(tam*sizeof(char));
+    int index = 0;
+
+    int tamPos = 0;
+    int* posBeijus = acharIndexDoBeiju(linha, tam, &tamPos);
+
+    for(int i = 0; i < tamPos-1; i++)
+    {
+        int j = posBeijus[i] + 1;
+        while(linha[j] != ']'){
+            beiju[beiju_index++] = linha[j];
+            j++;
+        }
+        beiju[beiju_index] = '\0';
+    }
+
+    for(int i = 0; i < tam; i++)
+    {
+        for(int j = 0; j < tamPos-1; j++)
+        {
+            if(!(i >= posBeijus[j] && i <= posBeijus[j+1])){
+                semBeiju[index++] = linha[i];
+            }
+        }
+    }
+    semBeiju[index] = '\0';
+
+    return semBeiju;
+}
+
+int main(){
+
+    FILE* arq = fopen("D:\\problems\\geral\\C\\arq\\tecladoQuebrado.txt", "r");
+
+    char linha[1001];
+    while (fgets(linha, sizeof(linha), arq) != NULL)
+    {
+        int tam = strlen(linha);
+        
+        if(verificarSeTemBeiju(linha, tam)){
+            char beiju[101];
+            char* semBeiju = extrairComBeiju(linha, tam, beiju);
+
+            printf("%s%s", beiju, semBeiju);
+        }else{
+            char* semBeiju = extrairSemBeiju(linha, tam);
+            printf("%s", semBeiju);
+        }
+    }
+    
+    fclose(arq);
+    return 0;
+}

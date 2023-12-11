@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "TP03Q01",
+            "request": "launch",
+            "mainClass": "TP03Q01",
+            "projectName": "Aeds2_dbc8b84e"
+        },
+        {
             "name": "(gdb) Bash on Windows Launch",
             "type": "cppdbg",
             "request": "launch",
@@ -17,7 +24,9 @@
             "pipeTransport": {
                 "debuggerPath": "/usr/bin/gdb",
                 "pipeProgram": "${env:windir}\\system32\\bash.exe",
-                "pipeArgs": ["-c"],
+                "pipeArgs": [
+                    "-c"
+                ],
                 "pipeCwd": ""
             },
             "setupCommands": [
@@ -58,6 +67,5 @@
                 }
             ]
         }
-
     ]
 }

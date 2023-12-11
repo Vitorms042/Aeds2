@@ -8,7 +8,6 @@ int comparacoes = 0;
 int movimentacoes = 0;
 
 typedef struct Jogador{
-
     char id[100];
     char nome[100];
     char peso[100];
@@ -17,11 +16,10 @@ typedef struct Jogador{
     char anoNascimento[100];
     char cidadeNascimento[100];
     char estadoNascimento[100];
-
 } Jogador;
 
-Jogador clone (Jogador *jogador){ 
-    Jogador novo; 
+Jogador clone(Jogador *jogador){
+    Jogador novo;
     strcpy(novo.id, jogador->id);
     strcpy(novo.nome, jogador->nome);
     strcpy(novo.altura, jogador->altura);
@@ -33,51 +31,42 @@ Jogador clone (Jogador *jogador){
     return novo;
 }
 
-void imprimir (Jogador *jogador){
-    printf("[%s ## %s ## %s ## %s ## %s ## %s ## %s ## %s]\n", jogador->id, jogador->nome, jogador->altura, jogador->peso, jogador->anoNascimento , jogador->universidade, jogador->cidadeNascimento, jogador->estadoNascimento);
+void imprimir(Jogador *jogador){
+    printf("[%s ## %s ## %s ## %s ## %s ## %s ## %s ## %s]\n", jogador->id, jogador->nome, jogador->altura, jogador->peso, jogador->anoNascimento, jogador->universidade, jogador->cidadeNascimento, jogador->estadoNascimento);
 }
 
-int frase(char* frase){
-    int numero = 0;
-    for(int i = 0; frase[i] != '\0'; i++){
-      numero += (int)frase[i];
-    }
-    return numero;
-}
+int comparar(const void *a, const void *b){
+    Jogador *jogadorA = (Jogador *)a;
+    Jogador *jogadorB = (Jogador *)b;
 
-int comparacao(const void *a, const void *b){
-    Jogador *jogador1 = (Jogador *)a;
-    Jogador *jogador2 = (Jogador *)b;
+    int resultadoPeso = atoi(jogadorA->peso) - atoi(jogadorB->peso);
 
-    int result = atoi(jogador1->peso) - atoi(jogador2->peso);
-
-    if(result == 0){
-        return strcmp(jogador1->nome, jogador2->nome);
+    if (resultadoPeso == 0){
+        return strcmp(jogadorA->nome, jogadorB->nome);
     }else{
-        return result;
+        return resultadoPeso;
     }
 }
 
 void shellsort(Jogador *jogador, int n){
-    int l = 1;
-    while(l < n / 3){
-        comparacoes++;
-        l = 3 * l + 1;
+    int h = 1;
+    while (h < n / 3){
+        h = 3 * h + 1;
     }
-    while(l >= 1){
-        for(int i = l; i < n; i++){
-          for(int j = i; j >= l; j -= l){
-            if(comparacao(&jogador[i], & jogador[j - l]) < 0){
+    while (h >= 1){
+        for (int i = h; i < n; i++){
+            for (int j = i; j >= h; j -= h){
                 comparacoes++;
-                Jogador tmp = jogador[j];
-                jogador[j] = jogador[j - l];
-                jogador[j - l] = tmp;
-                movimentacoes += 3;
+                if (comparar(&jogador[j], &jogador[j - h]) < 0){
+                    Jogador temp = jogador[j];
+                    jogador[j] = jogador[j - h];
+                    jogador[j - h] = temp;
+                    movimentacoes+=3;
+                }
             }
-          }
+        }
+        h /= 3;
     }
-    l /= 3;
-  }
 }
 
 void ler (Jogador *jogador, char linha[1000]){
